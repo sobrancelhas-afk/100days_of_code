@@ -1,7 +1,7 @@
-from turtle import Turtle, Screen
+from turtle import Screen
 from time import sleep
 
-from paddle import SCREEN_X, SCREEN_Y,Paddle
+from paddle import Paddle, SCREEN_X, SCREEN_Y, PADDLE_OFFSET
 from ball import Ball
 
 screen = Screen()
@@ -20,11 +20,26 @@ screen.delay(0)
 
 ## TODO Create ScoreBoard
 
-## Game Loop
-
-
 game = True
+
+#Generate collideables
 player = Paddle()
+wall = Paddle(spawn_coords=(+SCREEN_X - PADDLE_OFFSET, 0), paddle_length=50)
+roof = Paddle(spawn_coords=(0, +SCREEN_Y), paddle_width= 200)
+floor = Paddle(spawn_coords=(0, -SCREEN_Y), paddle_width= 200)
+
+################## TODO
+##################
+collideable = {
+    player.collision_coords : True,
+    wall.collision_coords : True,
+    roof.collision_coords : True,
+    floor.collision_coords : True
+}
+##################
+##################
+
+#Generate Ball
 ball = Ball()
 
 #mover paddle Up e Down
@@ -33,13 +48,23 @@ screen.onkey(fun=player.move_down,key="s")
 
 screen.listen()
 while game:
-
-    player.move()
+    
+    sleep(0.005)
     ball.move()
     screen.update()
 
     #collision with ball
-    ###
+    if ball.just_collided(bumper=player) 
+    
+    ####  Colocar collision dentro da func de ball ou das outras turtles???
 
-    sleep(0.005)
+    # if wall.update_collision_body(bumper=ball):
+    #     ball.just_collided()
+
+    # if roof.update_collision_body(bumper=ball):
+    #     ball.just_collided()
+
+    # if floor.update_collision_body(bumper=ball):
+    #     ball.just_collided()
+    
 screen.exitonclick()

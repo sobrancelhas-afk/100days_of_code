@@ -1,42 +1,59 @@
 from turtle import Turtle
 
 SCREEN_X = 700
-SCREEN_Y = 250
+SCREEN_Y = 350
+PADDLE_OFFSET = 100
+
+
+starting_player_coords = (-SCREEN_X + PADDLE_OFFSET, 0)
 
 class Paddle(Turtle):
-    def __init__(self):
+    def __init__(self, spawn_coords = starting_player_coords, paddle_length = 6, paddle_width = 1):
         super().__init__()
 
-        self.paddle_parts = []
-        self.paddle_parts_coords = []
-        self.paddle_size = 6
+        self.spawn_coords = spawn_coords
+        self.paddle_width = paddle_width
+        self.paddle_length = paddle_length
+        #self.shapesize(stretch_len=self.paddle_length, stretch_wid=paddle_width)
 
-        for n in range(self.paddle_size):
-            part = self.generate_paddle_part(part_n=n)
-            self.paddle_parts.append(part)
+        self.generate_paddle()
+        self.collision_coords = []
+        self.generate_collision_body()
 
-        self.core = self.paddle_parts[0]
-        
         #generate entire paddle
-    def generate_paddle_part(self,part_n):
-        paddle = Turtle(shape='square')
-        paddle.teleport(-SCREEN_X + 100, self.paddle_size+(part_n*20))
-        paddle.color('white')
-        paddle.setheading(90)  
-        paddle.penup()
-        paddle.speed(0)
-        self.paddle_parts_coords.append(paddle.pos())
-        return paddle            
-
-    def move(self):
-
-        for n in range(self.paddle_size):
-            x_cor= self.core.xcor()
-            y_cor= self.core.ycor() + (n * 20)
-            self.paddle_parts[n].goto(x_cor,y_cor)
-            
+    def generate_paddle(self):
+        self.shape('square')
+        self.shapesize(stretch_len=self.paddle_length, stretch_wid=self.paddle_width) # < -----
+        self.teleport(self.spawn_coords[0], self.spawn_coords[1]) #< ----
+        self.color('white')
+        self.setheading(90)  
+        self.penup()
+        self.speed(0)
 
     def move_up(self):
-        self.core.forward(20)
+        self.forward(20)
     def move_down(self):
-        self.core.backward(20)
+        self.backward(20)
+
+    def generate_collision_body(self, bumper):
+        #### x axis collisions
+        for i in range((-int(self.paddle_length/2)), int(self.paddle_length/2)):
+            self.collision_coords.append([self.xcor(), self.ycor() + (i * 20)])
+
+        for i in range((-int(self.paddle_width/2)), int(self.paddle_width/2)):
+            self.collision_coords.append([self.xcor() + (i * 20), self.ycor()])
+
+    def update_collision_body(self):
+        #update collision_body
+        for i in range((-int(self.paddle_length/2)), int(self.paddle_length/2)):
+                self.collision_coords[i][0] = (self.xcor() + (i * 20))
+        for i in range((-int(self.paddle_width/2)), int(self.paddle_width/2)):
+                self.collision_coords[i][1] = (self.ycor() + (i * 20))
+
+        ### Receive all collision coords??????? TODO
+        ### KEEP collision coords check in paddle or in ball?
+
+        for collision in self.collision_coords:
+            if abs(self.xcor() - collision[0]) < 20 and abs(self.ycor() - collision[1]) < 20:
+                self.collidable = False
+                return True
