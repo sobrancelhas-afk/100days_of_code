@@ -25,22 +25,22 @@ game = True
 #Generate collideables
 player = Paddle()
 wall = Paddle(spawn_coords=(+SCREEN_X - PADDLE_OFFSET, 0), paddle_length=50)
-roof = Paddle(spawn_coords=(0, +SCREEN_Y), paddle_width= 200)
-floor = Paddle(spawn_coords=(0, -SCREEN_Y), paddle_width= 200)
+roof = Paddle(spawn_coords=(0, +SCREEN_Y), can_reverse_ball_trajectory=False, paddle_length =1, paddle_width= 200)
+floor = Paddle(spawn_coords=(0, -SCREEN_Y), can_reverse_ball_trajectory=False, paddle_length =1, paddle_width= 200)
 
 ################## TODO
 ##################
-collideable = {
-    player.collision_coords : True,
-    wall.collision_coords : True,
-    roof.collision_coords : True,
-    floor.collision_coords : True
-}
+collideables = [
+    player,
+    wall,
+    roof,
+    floor
+]
 ##################
 ##################
 
 #Generate Ball
-ball = Ball()
+ball = Ball(collideables=collideables)
 
 #mover paddle Up e Down
 screen.onkey(fun=player.move_up,key="w")
@@ -49,22 +49,14 @@ screen.onkey(fun=player.move_down,key="s")
 screen.listen()
 while game:
     
-    sleep(0.005)
+    sleep(0.003)
     ball.move()
     screen.update()
 
     #collision with ball
-    if ball.just_collided(bumper=player) 
-    
-    ####  Colocar collision dentro da func de ball ou das outras turtles???
-
-    # if wall.update_collision_body(bumper=ball):
-    #     ball.just_collided()
-
-    # if roof.update_collision_body(bumper=ball):
-    #     ball.just_collided()
-
-    # if floor.update_collision_body(bumper=ball):
-    #     ball.just_collided()
+    ball.just_collided(bumper=player) 
+    ball.just_collided(bumper=wall)
+    ball.just_collided(bumper=floor)
+    ball.just_collided(bumper=roof)
     
 screen.exitonclick()

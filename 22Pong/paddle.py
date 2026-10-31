@@ -8,17 +8,17 @@ PADDLE_OFFSET = 100
 starting_player_coords = (-SCREEN_X + PADDLE_OFFSET, 0)
 
 class Paddle(Turtle):
-    def __init__(self, spawn_coords = starting_player_coords, paddle_length = 6, paddle_width = 1):
+    def __init__(self,can_reverse_ball_trajectory = True, spawn_coords = starting_player_coords, paddle_length = 6, paddle_width = 1):
         super().__init__()
 
         self.spawn_coords = spawn_coords
         self.paddle_width = paddle_width
         self.paddle_length = paddle_length
-        #self.shapesize(stretch_len=self.paddle_length, stretch_wid=paddle_width)
+
+        self.can_reverse_ball_trajectory = can_reverse_ball_trajectory
 
         self.generate_paddle()
-        self.collision_coords = []
-        self.generate_collision_body()
+        self.collision_body()
 
         #generate entire paddle
     def generate_paddle(self):
@@ -32,28 +32,19 @@ class Paddle(Turtle):
 
     def move_up(self):
         self.forward(20)
+        self.collision_body()
     def move_down(self):
         self.backward(20)
+        self.collision_body()
 
-    def generate_collision_body(self, bumper):
-        #### x axis collisions
-        for i in range((-int(self.paddle_length/2)), int(self.paddle_length/2)):
-            self.collision_coords.append([self.xcor(), self.ycor() + (i * 20)])
+    def collision_body(self):
 
-        for i in range((-int(self.paddle_width/2)), int(self.paddle_width/2)):
-            self.collision_coords.append([self.xcor() + (i * 20), self.ycor()])
+        px = self.xcor()
+        py = self.ycor()
 
-    def update_collision_body(self):
-        #update collision_body
-        for i in range((-int(self.paddle_length/2)), int(self.paddle_length/2)):
-                self.collision_coords[i][0] = (self.xcor() + (i * 20))
-        for i in range((-int(self.paddle_width/2)), int(self.paddle_width/2)):
-                self.collision_coords[i][1] = (self.ycor() + (i * 20))
+        self.paddle_edge_left = px - (self.paddle_width * 20/2)
+        self.paddle_edge_right = px + (self.paddle_width* 20/2)
+        self.paddle_edge_bottom = py - (self.paddle_length* 20/2)
+        self.paddle_edge_top = py + (self.paddle_length* 20/2)
 
-        ### Receive all collision coords??????? TODO
-        ### KEEP collision coords check in paddle or in ball?
 
-        for collision in self.collision_coords:
-            if abs(self.xcor() - collision[0]) < 20 and abs(self.ycor() - collision[1]) < 20:
-                self.collidable = False
-                return True
